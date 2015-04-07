@@ -29,10 +29,10 @@ public class MainBukaOut extends Application {
     launch(args);
   }
 
+  private final ObservableList<BukaRow> data = FXCollections.observableArrayList();
   private final double defaultHeight = Screen.getPrimary().getVisualBounds().getHeight();
   private final double defaultWidth = Screen.getPrimary().getVisualBounds().getWidth();
   private Spieltag spieltag;
-  private Stage stage;
   private final TableView<BukaRow> table = new TableView<>();
 
   private Node getSpieltagComboBox() {
@@ -45,10 +45,8 @@ public class MainBukaOut extends Application {
     comboBox.setValue("Spieltag " + spieltag.getNumber());
     comboBox.valueProperty().addListener((ChangeListener<String>) (ov, oldSt, newSt) -> {
       int newSpieltagNumber = Integer.parseInt(newSt.split(" ")[1]);
-      stage.hide();
       spieltag = new SpieltagOpenLigaDB(newSpieltagNumber);
       updateView();
-      stage.show();
     });
     return comboBox;
   }
@@ -70,22 +68,11 @@ public class MainBukaOut extends Application {
 
   @Override
   public void start(final Stage stage) {
-    this.stage = stage;
     spieltag = new SpieltagOpenLigaDB();
     stage.setWidth(defaultWidth);
     stage.setHeight(defaultHeight);
     table.setEditable(false);
     table.setMinWidth(defaultWidth);
-    stage.show();
-    updateView();
-  }
-
-  private void updateView() {
-    final List<Partie> partien = spieltag.getPartien();
-    final ObservableList<BukaRow> data = FXCollections.observableArrayList();
-    partien.forEach(partie -> {
-      data.add(new BukaRow(partie));
-    });
     // javafx
     Scene scene = new Scene(new Group());
     stage.setTitle("Bundesliga Kasper - Spieltag " + spieltag.getNumber());
@@ -116,5 +103,15 @@ public class MainBukaOut extends Application {
     Group group = ((Group) scene.getRoot());
     group.getChildren().add(border);
     stage.setScene(scene);
+    updateView();
+    stage.show();
+  }
+
+  private void updateView() {
+    final List<Partie> partien = spieltag.getPartien();
+    data.clear();
+    partien.forEach(partie -> {
+      data.add(new BukaRow(partie));
+    });
   }
 }

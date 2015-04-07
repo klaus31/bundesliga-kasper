@@ -1,6 +1,22 @@
 apply plugin: 'java'
 apply plugin: 'eclipse'
 
+version = '0.0.1'
+
+jar {
+  manifest { 
+    attributes "Main-Class": "buka.MainBukaOut"
+  }  
+  from {
+    configurations.compile.collect {
+      it.isDirectory() ? it : zipTree(it)
+    }
+    configurations.runtime.collect {
+      it.isDirectory() ? it : zipTree(it)
+    }
+  }
+}
+
 repositories {
   mavenCentral()
 }

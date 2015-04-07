@@ -19,6 +19,9 @@ public class Quote {
   }
 
   private Double parseDouble(String quote) {
+    if (quote.equals("-")) {
+      return null;
+    }
     quote = quote.replaceAll(",", ".");
     return Double.parseDouble(quote);
   }
