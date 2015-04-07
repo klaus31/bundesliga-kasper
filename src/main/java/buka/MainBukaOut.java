@@ -33,6 +33,7 @@ public class MainBukaOut extends Application {
   private final double defaultHeight = Screen.getPrimary().getVisualBounds().getHeight();
   private final double defaultWidth = Screen.getPrimary().getVisualBounds().getWidth();
   private Spieltag spieltag;
+  private Stage stage;
   private final TableView<BukaRow> table = new TableView<>();
 
   private Node getSpieltagComboBox() {
@@ -68,14 +69,14 @@ public class MainBukaOut extends Application {
 
   @Override
   public void start(final Stage stage) {
-    spieltag = new SpieltagOpenLigaDB();
+    this.stage = stage;
+    spieltag = new SpieltagOpenLigaDB(27);
     stage.setWidth(defaultWidth);
     stage.setHeight(defaultHeight);
     table.setEditable(false);
     table.setMinWidth(defaultWidth);
     // javafx
     Scene scene = new Scene(new Group());
-    stage.setTitle("Bundesliga Kasper - Spieltag " + spieltag.getNumber());
     final TableColumn colAnpfiff = getTableColumn("Anpfiff", "anpfiff", 9);
     final TableColumn colPartie = new TableColumn("Partie");
     colPartie.getColumns().add(getTableColumn("H", "partieHeim", 15));
@@ -108,6 +109,7 @@ public class MainBukaOut extends Application {
   }
 
   private void updateView() {
+    stage.setTitle("Bundesliga Kasper - Spieltag " + spieltag.getNumber());
     final List<Partie> partien = spieltag.getPartien();
     data.clear();
     partien.forEach(partie -> {

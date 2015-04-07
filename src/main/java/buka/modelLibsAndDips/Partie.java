@@ -46,6 +46,6 @@ public class Partie {
   }
 
   public boolean isFinished() {
-    return getAbpfiff().before(new Date());
+    return getAbpfiff().getTime().before(new Date());
   }
 }

@@ -22,8 +22,12 @@ public class Quote {
     if (quote.equals("-")) {
       return null;
     }
-    quote = quote.replaceAll(",", ".");
-    return Double.parseDouble(quote);
+    try {
+      quote = quote.replaceAll(",", ".");
+      return Double.parseDouble(quote);
+    } catch (NumberFormatException e) {
+      return null;
+    }
   }
 
   public void setSiegAusw(final Double siegAusw) {

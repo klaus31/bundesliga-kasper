@@ -12,7 +12,8 @@ import buka.modelLibsAndDips.URLReader;
 
 class QuotenFactoryTipico implements QuotenFactory {
 
-  private static String content = null;
+  private static String currentContent = null;
+  private static String currentUrl = null;
   private final Partie partie;
 
   public QuotenFactoryTipico(final Partie partie) {
@@ -22,12 +23,13 @@ class QuotenFactoryTipico implements QuotenFactory {
       System.err.println("This class does only work with past anpfiffies");
       System.exit(1504071003);
     }
-    if (content == null) {
-      final String urlFormat = "https://www.tipico.de/de/ergebnisse/fussball/deutschland/g42301-1-bundesliga/%s/kw%s/";
-      String url = String.format(urlFormat, anpfiff.get(Calendar.YEAR), anpfiff.get(Calendar.WEEK_OF_YEAR));
+    final String urlFormat = "https://www.tipico.de/de/ergebnisse/fussball/deutschland/g42301-1-bundesliga/%s/kw%s/";
+    String url = String.format(urlFormat, anpfiff.get(Calendar.YEAR), anpfiff.get(Calendar.WEEK_OF_YEAR));
+    if (currentContent == null || !url.equals(currentUrl)) {
+      currentUrl = url;
       final String htmlContent = URLReader.getStringFromUrl(url);
-      content = Jsoup.parse(htmlContent.replaceAll("(?i)<br[^>]*>", "br2n").replaceAll("(?i)<tr[^>]*>", "br2n")).text();
-      content = content.replaceAll("br2n", System.lineSeparator());
+      currentContent = Jsoup.parse(htmlContent.replaceAll("(?i)<br[^>]*>", "br2n").replaceAll("(?i)<tr[^>]*>", "br2n")).text();
+      currentContent = currentContent.replaceAll("br2n", System.lineSeparator());
     }
   }
 
@@ -42,9 +44,11 @@ class QuotenFactoryTipico implements QuotenFactory {
     } else if (result.equals("1. FC Köln")) {
       result = "1.FC Köln";
     } else if (result.equals("Borussia Dortmund")) {
-      result = "Bor. Dortmund";
+      // TODO mal Bor. Dortmund mal Borussia Dortmund
+      result = "Dortmund";
     } else if (result.equals("Bayern München")) {
-      result = "Bay. München";
+      // TODO mal Bay. München mal Bayern München
+      result = "München";
     } else if (result.equals("FC Schalke 04")) {
       result = "Schalke 04";
     } else if (result.equals("SC Paderborn 07")) {
@@ -56,18 +60,25 @@ class QuotenFactoryTipico implements QuotenFactory {
     return result;
   }
 
+  // FIXME englische woche geht net
   @Override
   public Quote getQuote() {
     final String heim = getMannschaftName(this.partie.getMannschaftHeim().getName());
     final String ausw = getMannschaftName(this.partie.getMannschaftAusw().getName());
-    String part = content.substring(content.indexOf(heim));
-    part = part.substring(part.indexOf(ausw) + ausw.length());
-    part = part.substring(0, 20).trim();
-    String[] quotenString = part.split(" ");
-    final Quote result = new Quote();
-    result.setSiegHeim(quotenString[0]);
-    result.setUnentschieden(quotenString[1]);
-    result.setSiegAusw(quotenString[2]);
-    return result;
+    try {
+      String part = currentContent.substring(currentContent.indexOf(heim));
+      part = part.substring(part.indexOf(ausw) + ausw.length());
+      part = part.substring(0, 20).trim();
+      String[] quotenString = part.split(" ");
+      final Quote result = new Quote();
+      result.setSiegHeim(quotenString[0]);
+      result.setUnentschieden(quotenString[1]);
+      result.setSiegAusw(quotenString[2]);
+      return result;
+    } catch (StringIndexOutOfBoundsException e) {
+      e.printStackTrace();
+      System.err.println(heim + " : " + ausw);
+      return new Quote();
+    }
   }
 }
