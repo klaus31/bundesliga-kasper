@@ -17,5 +17,6 @@ public class EinsatzStrategieKellyTest {
     Budget budget = es.getEmpfohlenenEinsatz(Budget.DEFAULT_PARTIE);
     int assertBudget = (int) Math.round(budget.getEuroCents() * ((1.5 * .8 - 1) / (1.5 - 1)));
     assertEquals(assertBudget, es.getEmpfohlenenEinsatz(budget).getEuroCents());
+    assertEquals("1,78 €", es.getEmpfohlenenEinsatz(budget).toString());
   }
 }

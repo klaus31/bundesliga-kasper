@@ -33,6 +33,10 @@ public class Quote {
     return unentschieden;
   }
 
+  public boolean isComplete() {
+    return unentschieden != null && siegAusw != null && siegHeim != null;
+  }
+
   private Double parseDouble(String quote) {
     if (quote.equals("-")) {
       return null;

@@ -16,14 +16,16 @@ import buka.wetten.Budget;
 import buka.wetten.EinsatzStrategie;
 import buka.wetten.EinsatzStrategieKelly;
 import buka.wetten.WettStrategie;
-import buka.wetten.WettStrategieSchwarmintelligenzVsQuote;
+import buka.wetten.WettStrategieSchwarmintelligenzUndQuote;
+import buka.wetten.Wette;
+import buka.wetten.WetteAuf;
 
 public class BukaRow {
 
-  private static final Budget BUDGET = Budget.DEFAULT_PARTIE;
+  private static final Budget BUDGET = Budget.DEFAULT_SPIELTAG;
   private final DecimalFormat dfDefault = new DecimalFormat("0");
   private final DecimalFormat dfTwoDp = new DecimalFormat("0.00");
-  private final EinsatzStrategie einsatzStrategie;
+  private final Budget empfohlenerEinsatz;
   private final Ergebnis ergebnis;
   private final Partie partie;
   private final Quote quote;
@@ -37,9 +39,10 @@ public class BukaRow {
     tippAverage = new TippBundesligaStatistikDeAverage(partie);
     tippLeader = new TippBundesligaStatistikDeLeader(partie);
     final QuotenFactory qf = new QuotenFactoryProxy(partie);
-    wettStrategie = new WettStrategieSchwarmintelligenzVsQuote((TippFactory) tippAverage, qf);
+    wettStrategie = new WettStrategieSchwarmintelligenzUndQuote((TippFactory) tippAverage, qf);
     quote = qf.getQuote();
-    einsatzStrategie = new EinsatzStrategieKelly(qf, wettStrategie);
+    EinsatzStrategie einsatzStrategie = new EinsatzStrategieKelly(qf, wettStrategie);
+    empfohlenerEinsatz = einsatzStrategie.getEmpfohlenenEinsatz(BUDGET);
   }
 
   public String getAnpfiff() {
@@ -122,16 +125,35 @@ public class BukaRow {
   }
 
   public String getWetteEinsatz() {
-    Budget budget = einsatzStrategie.getEmpfohlenenEinsatz(BUDGET);
-    return budget.toString();
+    return empfohlenerEinsatz.toString();
   }
 
   public String getWetteGewinn() {
-    return "TODO";
+    if (partie.isFinished()) {
+      Wette wette = wettStrategie.getFavorisierteWette();
+      WetteAuf wetteAuf = wette.getWetteAuf();
+      if (partie.getErgebnis().matches(wetteAuf)) {
+        return new Budget(quote.getProfitRate(wette) * empfohlenerEinsatz.getEuroCents()).toString();
+      } else {
+        return Budget.NO.toString();
+      }
+    } else {
+      return "?";
+    }
   }
 
   public String getWetteVerlust() {
-    return "TODO";
+    if (partie.isFinished()) {
+      Wette wette = wettStrategie.getFavorisierteWette();
+      WetteAuf wetteAuf = wette.getWetteAuf();
+      if (partie.getErgebnis().matches(wetteAuf)) {
+        return Budget.NO.toString();
+      } else {
+        return new Budget(quote.getProfitRate(wette) * empfohlenerEinsatz.getEuroCents()).toString();
+      }
+    } else {
+      return "?";
+    }
   }
 
   public String getWetteWahrscheinlichkeit() {

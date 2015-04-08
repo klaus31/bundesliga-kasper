@@ -47,6 +47,8 @@ public class MainBukaOut extends Application {
     comboBox.setValue("Spieltag " + spieltag.getNumber());
     comboBox.valueProperty().addListener((ChangeListener<String>) (ov, oldSt, newSt) -> {
       int newSpieltagNumber = Integer.parseInt(newSt.split(" ")[1]);
+      data.clear();
+      stage.setTitle("WART MA AB");
       spieltag = new SpieltagOpenLigaDB(newSpieltagNumber);
       updateView();
     });

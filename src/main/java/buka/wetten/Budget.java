@@ -18,7 +18,7 @@ public class Budget {
   }
 
   public double getEuros() {
-    return cents / 100;
+    return 1D * cents / 100;
   }
 
   @Override
