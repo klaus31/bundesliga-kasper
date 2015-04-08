@@ -3,24 +3,33 @@ package buka;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 
-import buka.bundesligaStatistikDe.TippBundesligaStatistikDeAverage;
-import buka.bundesligaStatistikDe.TippBundesligaStatistikDeLeader;
-import buka.modelLibsAndDips.Ergebnis;
-import buka.modelLibsAndDips.Partie;
-import buka.modelLibsAndDips.Quote;
-import buka.modelLibsAndDips.QuotenFactory;
-import buka.modelLibsAndDips.Tipp;
+import buka.basics.Ergebnis;
+import buka.basics.Partie;
+import buka.quoten.Quote;
+import buka.quoten.QuotenFactory;
 import buka.quoten.QuotenFactoryProxy;
+import buka.tipps.TippBundesligaStatistikDeAverage;
+import buka.tipps.TippBundesligaStatistikDeLeader;
+import buka.tipps.TippFactory;
+import buka.tipps.TippStatistik;
+import buka.wetten.Budget;
+import buka.wetten.EinsatzStrategie;
+import buka.wetten.EinsatzStrategieKelly;
+import buka.wetten.WettStrategie;
+import buka.wetten.WettStrategieSchwarmintelligenzVsQuote;
 
 public class BukaRow {
 
+  private static final Budget BUDGET = Budget.DEFAULT_PARTIE;
   private final DecimalFormat dfDefault = new DecimalFormat("0");
   private final DecimalFormat dfTwoDp = new DecimalFormat("0.00");
+  private final EinsatzStrategie einsatzStrategie;
   private final Ergebnis ergebnis;
   private final Partie partie;
   private final Quote quote;
-  private final Tipp tippAverage;
-  private final Tipp tippLeader;
+  private final TippStatistik tippAverage;
+  private final TippStatistik tippLeader;
+  private final WettStrategie wettStrategie;
 
   public BukaRow(final Partie partie) {
     this.partie = partie;
@@ -28,7 +37,9 @@ public class BukaRow {
     tippAverage = new TippBundesligaStatistikDeAverage(partie);
     tippLeader = new TippBundesligaStatistikDeLeader(partie);
     final QuotenFactory qf = new QuotenFactoryProxy(partie);
+    wettStrategie = new WettStrategieSchwarmintelligenzVsQuote((TippFactory) tippAverage, qf);
     quote = qf.getQuote();
+    einsatzStrategie = new EinsatzStrategieKelly(qf, wettStrategie);
   }
 
   public String getAnpfiff() {
@@ -95,5 +106,35 @@ public class BukaRow {
       result = dfDefault.format(tippLeader.getToreHeim());
     }
     return result;
+  }
+
+  public String getWetteAuf() {
+    switch (wettStrategie.getFavorisierteWette().getWetteAuf()) {
+    case SIEG_AUSW:
+      return "A";
+    case SIEG_HEIM:
+      return "H";
+    case UNENTSCHIEDEN:
+      return "U";
+    default:
+      return "!";
+    }
+  }
+
+  public String getWetteEinsatz() {
+    Budget budget = einsatzStrategie.getEmpfohlenenEinsatz(BUDGET);
+    return budget.toString();
+  }
+
+  public String getWetteGewinn() {
+    return "TODO";
+  }
+
+  public String getWetteVerlust() {
+    return "TODO";
+  }
+
+  public String getWetteWahrscheinlichkeit() {
+    return Math.round(wettStrategie.getFavorisierteWette().getWahrscheinlichkeit() * 100) + "";
   }
 }

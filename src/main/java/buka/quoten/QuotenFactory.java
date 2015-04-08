@@ -1,4 +1,4 @@
-package buka.modelLibsAndDips;
+package buka.quoten;
 
 public interface QuotenFactory {
 

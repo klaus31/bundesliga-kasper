@@ -1,4 +1,14 @@
 .root{
-    -fx-font-size: 8pt;
-    -fx-font-family: "Trebuchet";
+  -fx-font-size: 9pt;
+  -fx-font-family: "Trebuchet";
+}
+.table-row-cell:empty {
+  -fx-background-color: white;
+}
+ 
+.table-row-cell:empty .table-cell {
+  -fx-border-width: 0px;
+}
+.list-cell:empty {
+  -fx-background-color: white;
 }

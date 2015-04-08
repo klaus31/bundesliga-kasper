@@ -1,4 +1,4 @@
-package buka.openLigaDB;
+package buka.spieltage;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -9,11 +9,10 @@ import org.joda.time.format.ISODateTimeFormat;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-import buka.modelLibsAndDips.Ergebnis;
-import buka.modelLibsAndDips.Mannschaft;
-import buka.modelLibsAndDips.Partie;
-import buka.modelLibsAndDips.Spieltag;
-import buka.modelLibsAndDips.URLReader;
+import buka.basics.Ergebnis;
+import buka.basics.Mannschaft;
+import buka.basics.Partie;
+import buka.basics.URLReader;
 
 public class SpieltagOpenLigaDB implements Spieltag {
 

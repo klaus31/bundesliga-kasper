@@ -1,4 +1,4 @@
-package buka.bundesligaStatistikDe;
+package buka.tipps;
 
 import java.nio.charset.Charset;
 import java.util.ArrayList;
@@ -6,13 +6,11 @@ import java.util.List;
 
 import org.jsoup.Jsoup;
 
-import buka.modelLibsAndDips.Mannschaft;
-import buka.modelLibsAndDips.Partie;
-import buka.modelLibsAndDips.Tipp;
-import buka.modelLibsAndDips.TippOfUser;
-import buka.modelLibsAndDips.URLReader;
+import buka.basics.Mannschaft;
+import buka.basics.Partie;
+import buka.basics.URLReader;
 
-public abstract class TippBundesligaStatistikDe implements Tipp {
+public abstract class TippBundesligaStatistikDe implements TippFactory, TippStatistik {
 
   private static String content = null;
 
@@ -49,7 +47,8 @@ public abstract class TippBundesligaStatistikDe implements Tipp {
     return partie;
   }
 
-  protected List<TippOfUser> getTippsOfUsers() {
+  @Override
+  public List<TippOfUser> getTippsOfUsers() {
     if (tippsOfUsers == null) {
       tippsOfUsers = new ArrayList<>();
       String result = getContent();

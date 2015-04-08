@@ -1,10 +1,25 @@
-package buka.modelLibsAndDips;
+package buka.quoten;
+
+import buka.wetten.Wette;
 
 public class Quote {
 
   private Double siegAusw = null;
   private Double siegHeim = null;
   private Double unentschieden = null;
+
+  public Double getProfitRate(final Wette wette) {
+    switch (wette.getWetteAuf()) {
+    case SIEG_AUSW:
+      return getSiegAusw();
+    case SIEG_HEIM:
+      return getSiegHeim();
+    case UNENTSCHIEDEN:
+      return getUnentschieden();
+    default:
+      return 0D;
+    }
+  }
 
   public Double getSiegAusw() {
     return siegAusw;

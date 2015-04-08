@@ -1,8 +1,7 @@
-package buka.modelLibsAndDips;
+package buka.basics;
 
 import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.net.URL;
@@ -52,15 +51,20 @@ public class URLReader {
 
   public static String getStringFromUrl(final String url, final Charset charset) {
     System.out.println("requesting " + url);
+    BufferedReader rd = null;
     try {
-      InputStream is = new URL(url).openStream();
-      BufferedReader rd = new BufferedReader(new InputStreamReader(is, charset));
+      rd = new BufferedReader(new InputStreamReader(new URL(url).openStream(), charset));
       String jsonText = readAll(rd);
       return jsonText;
     } catch (IOException e) {
       System.err.println(url + " is kacke");
       System.exit(1504061224);
       return null;
+    } finally {
+      try {
+        rd.close();
+      } catch (IOException e) {
+      }
     }
   }
 

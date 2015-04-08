@@ -1,8 +1,6 @@
 package buka.quoten;
 
-import buka.modelLibsAndDips.Partie;
-import buka.modelLibsAndDips.Quote;
-import buka.modelLibsAndDips.QuotenFactory;
+import buka.basics.Partie;
 
 public class QuotenFactoryProxy implements QuotenFactory {
 

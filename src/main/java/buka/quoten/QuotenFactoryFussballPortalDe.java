@@ -2,10 +2,8 @@ package buka.quoten;
 
 import org.jsoup.Jsoup;
 
-import buka.modelLibsAndDips.Partie;
-import buka.modelLibsAndDips.Quote;
-import buka.modelLibsAndDips.QuotenFactory;
-import buka.modelLibsAndDips.URLReader;
+import buka.basics.Partie;
+import buka.basics.URLReader;
 
 class QuotenFactoryFussballPortalDe implements QuotenFactory {
 

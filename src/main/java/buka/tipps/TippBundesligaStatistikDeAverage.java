@@ -1,9 +1,8 @@
-package buka.bundesligaStatistikDe;
+package buka.tipps;
 
 import java.util.List;
 
-import buka.modelLibsAndDips.Partie;
-import buka.modelLibsAndDips.TippOfUser;
+import buka.basics.Partie;
 
 public class TippBundesligaStatistikDeAverage extends TippBundesligaStatistikDe {
 
@@ -12,7 +11,7 @@ public class TippBundesligaStatistikDeAverage extends TippBundesligaStatistikDe 
   }
 
   @Override
-  public String getPerson() {
+  public String getName() {
     return "ø of " + this.getTippsOfUsers().size() + " users";
   }
 
@@ -23,7 +22,7 @@ public class TippBundesligaStatistikDeAverage extends TippBundesligaStatistikDe 
     for (TippOfUser tipp : tipps) {
       sum += tipp.getToreAusw();
     }
-    return sum / tipps.size();
+    return 1D * sum / tipps.size();
   }
 
   @Override

@@ -1,4 +1,4 @@
-package buka.modelLibsAndDips;
+package buka.basics;
 
 public class Ergebnis {
 

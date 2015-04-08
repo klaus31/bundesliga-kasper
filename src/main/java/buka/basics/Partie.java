@@ -1,7 +1,9 @@
-package buka.modelLibsAndDips;
+package buka.basics;
 
 import java.util.Calendar;
 import java.util.Date;
+
+import buka.spieltage.Spieltag;
 
 public class Partie {
 

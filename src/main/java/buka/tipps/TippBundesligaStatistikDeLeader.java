@@ -1,7 +1,6 @@
-package buka.bundesligaStatistikDe;
+package buka.tipps;
 
-import buka.modelLibsAndDips.Partie;
-import buka.modelLibsAndDips.TippOfUser;
+import buka.basics.Partie;
 
 public class TippBundesligaStatistikDeLeader extends TippBundesligaStatistikDe {
 
@@ -28,17 +27,17 @@ public class TippBundesligaStatistikDeLeader extends TippBundesligaStatistikDe {
   }
 
   @Override
-  public String getPerson() {
+  public String getName() {
     return "Fuehrender Tipper";
   }
 
   @Override
   public Double getToreAusw() {
-    return tipp == null ? null : tipp.getToreAusw();
+    return tipp == null ? null : 1D * tipp.getToreAusw();
   }
 
   @Override
   public Double getToreHeim() {
-    return tipp == null ? null : tipp.getToreHeim();
+    return tipp == null ? null : 1D * tipp.getToreHeim();
   }
 }

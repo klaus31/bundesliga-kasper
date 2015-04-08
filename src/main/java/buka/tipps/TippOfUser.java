@@ -1,10 +1,10 @@
-package buka.modelLibsAndDips;
+package buka.tipps;
 
 public class TippOfUser implements Tipp {
 
   private String person;
-  private Double toreAusw;
-  private Double toreHeim;
+  private int toreAusw;
+  private int toreHeim;
 
   @Override
   public String getPerson() {
@@ -12,12 +12,12 @@ public class TippOfUser implements Tipp {
   }
 
   @Override
-  public Double getToreAusw() {
+  public int getToreAusw() {
     return toreAusw;
   }
 
   @Override
-  public Double getToreHeim() {
+  public int getToreHeim() {
     return toreHeim;
   }
 
@@ -25,19 +25,19 @@ public class TippOfUser implements Tipp {
     this.person = person;
   }
 
-  public void setToreAusw(final Double toreAusw) {
+  public void setToreAusw(final int toreAusw) {
     this.toreAusw = toreAusw;
   }
 
   public void setToreAusw(final String tore) throws NumberFormatException {
-    setToreAusw(Double.parseDouble(tore.trim()));
+    setToreAusw(Integer.parseInt(tore.trim()));
   }
 
-  public void setToreHeim(final Double toreHeim) {
+  public void setToreHeim(final int toreHeim) {
     this.toreHeim = toreHeim;
   }
 
   public void setToreHeim(final String tore) throws NumberFormatException {
-    setToreHeim(Double.parseDouble(tore.trim()));
+    setToreHeim(Integer.parseInt(tore.trim()));
   }
 }
