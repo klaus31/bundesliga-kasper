@@ -5,7 +5,7 @@ import buka.modelLibsAndDips.TippOfUser;
 
 public class TippBundesligaStatistikDeLeader extends TippBundesligaStatistikDe {
 
-  private TippOfUser tipp;
+  private TippOfUser tipp = null;
 
   public TippBundesligaStatistikDeLeader(final Partie partie) {
     super(partie);
@@ -33,12 +33,12 @@ public class TippBundesligaStatistikDeLeader extends TippBundesligaStatistikDe {
   }
 
   @Override
-  public double getToreAusw() {
-    return tipp.getToreAusw();
+  public Double getToreAusw() {
+    return tipp == null ? null : tipp.getToreAusw();
   }
 
   @Override
-  public double getToreHeim() {
-    return tipp.getToreHeim();
+  public Double getToreHeim() {
+    return tipp == null ? null : tipp.getToreHeim();
   }
 }

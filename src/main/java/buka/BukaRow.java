@@ -5,6 +5,7 @@ import java.text.SimpleDateFormat;
 
 import buka.bundesligaStatistikDe.TippBundesligaStatistikDeAverage;
 import buka.bundesligaStatistikDe.TippBundesligaStatistikDeLeader;
+import buka.modelLibsAndDips.Ergebnis;
 import buka.modelLibsAndDips.Partie;
 import buka.modelLibsAndDips.Quote;
 import buka.modelLibsAndDips.QuotenFactory;
@@ -13,77 +14,86 @@ import buka.quoten.QuotenFactoryProxy;
 
 public class BukaRow {
 
-  private final String anpfiff;
   private final DecimalFormat dfDefault = new DecimalFormat("0");
   private final DecimalFormat dfTwoDp = new DecimalFormat("0.00");
-  private final String partieAusw;
-  private final String partieHeim;
-  private final String quoteSiegAusw;
-  private final String quoteSiegHeim;
-  private final String quoteUnentschieden;
-  private final String tippAverageAusw;
-  private final String tippAverageHeim;
-  private final String tippLeaderAusw;
-  private final String tippLeaderHeim;
+  private final Ergebnis ergebnis;
+  private final Partie partie;
+  private final Quote quote;
+  private final Tipp tippAverage;
+  private final Tipp tippLeader;
 
   public BukaRow(final Partie partie) {
-    final Tipp tippAverage = new TippBundesligaStatistikDeAverage(partie);
-    final Tipp tippLeader = new TippBundesligaStatistikDeLeader(partie);
+    this.partie = partie;
+    ergebnis = partie.getErgebnis();
+    tippAverage = new TippBundesligaStatistikDeAverage(partie);
+    tippLeader = new TippBundesligaStatistikDeLeader(partie);
     final QuotenFactory qf = new QuotenFactoryProxy(partie);
-    final Quote quote = qf.getQuote();
-    this.tippAverageHeim = dfTwoDp.format(tippAverage.getToreHeim());
-    this.tippAverageAusw = dfTwoDp.format(tippAverage.getToreAusw());
-    this.tippLeaderHeim = dfDefault.format(tippLeader.getToreHeim());
-    this.tippLeaderAusw = dfDefault.format(tippLeader.getToreAusw());
-    this.partieHeim = partie.getMannschaftHeim().getName();
-    this.partieAusw = partie.getMannschaftAusw().getName();
-    this.quoteUnentschieden = formatQuoteValue(quote.getUnentschieden());
-    this.quoteSiegHeim = formatQuoteValue(quote.getSiegHeim());
-    this.quoteSiegAusw = formatQuoteValue(quote.getSiegAusw());
-    this.anpfiff = new SimpleDateFormat("d.M.yy H:mm").format(partie.getAnpfiff().getTime());
-  }
-
-  private String formatQuoteValue(final Double quoteValue) {
-    return quoteValue == null ? "?" : dfTwoDp.format(quoteValue);
+    quote = qf.getQuote();
   }
 
   public String getAnpfiff() {
-    return anpfiff;
+    return new SimpleDateFormat("d.M.yy H:mm").format(partie.getAnpfiff().getTime());
+  }
+
+  public String getErgebnisAusw() {
+    final Integer ergebnisAusw = ergebnis == null ? null : ergebnis.getAusw();
+    return ergebnisAusw == null ? "?" : ergebnisAusw + "";
+  }
+
+  public String getErgebnisHeim() {
+    final Integer ergebnisHeim = ergebnis == null ? null : ergebnis.getHeim();
+    return ergebnisHeim == null ? "?" : ergebnisHeim + "";
   }
 
   public String getPartieAusw() {
-    return partieAusw;
+    return partie.getMannschaftAusw().getName();
   }
 
   public String getPartieHeim() {
-    return partieHeim;
+    return partie.getMannschaftHeim().getName();
   }
 
   public String getQuoteSiegAusw() {
-    return quoteSiegAusw;
+    return quote.getSiegAusw() == null ? "?" : dfTwoDp.format(quote.getSiegAusw());
   }
 
   public String getQuoteSiegHeim() {
-    return quoteSiegHeim;
+    return quote.getSiegHeim() == null ? "?" : dfTwoDp.format(quote.getSiegHeim());
   }
 
   public String getQuoteUnentschieden() {
-    return quoteUnentschieden;
+    return quote.getUnentschieden() == null ? "?" : dfTwoDp.format(quote.getUnentschieden());
   }
 
   public String getTippAverageAusw() {
-    return tippAverageAusw;
+    String result = "?";
+    if (tippAverage.getToreAusw() != null) {
+      result = dfTwoDp.format(tippAverage.getToreAusw());
+    }
+    return result;
   }
 
   public String getTippAverageHeim() {
-    return tippAverageHeim;
+    String result = "?";
+    if (tippAverage.getToreHeim() != null) {
+      result = dfTwoDp.format(tippAverage.getToreHeim());
+    }
+    return result;
   }
 
   public String getTippLeaderAusw() {
-    return tippLeaderAusw;
+    String result = "?";
+    if (tippLeader.getToreAusw() != null) {
+      result = dfDefault.format(tippLeader.getToreAusw());
+    }
+    return result;
   }
 
   public String getTippLeaderHeim() {
-    return tippLeaderHeim;
+    String result = "?";
+    if (tippLeader.getToreHeim() != null) {
+      result = dfDefault.format(tippLeader.getToreHeim());
+    }
+    return result;
   }
 }

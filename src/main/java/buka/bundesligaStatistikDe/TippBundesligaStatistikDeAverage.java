@@ -7,22 +7,17 @@ import buka.modelLibsAndDips.TippOfUser;
 
 public class TippBundesligaStatistikDeAverage extends TippBundesligaStatistikDe {
 
-  public TippBundesligaStatistikDeAverage(Partie partie) {
+  public TippBundesligaStatistikDeAverage(final Partie partie) {
     super(partie);
   }
 
   @Override
-  public double getToreHeim() {
-    List<TippOfUser> tipps = this.getTippsOfUsers();
-    double sum = 0;
-    for (TippOfUser tipp : tipps) {
-      sum += tipp.getToreHeim();
-    }
-    return sum / tipps.size();
+  public String getPerson() {
+    return "ø of " + this.getTippsOfUsers().size() + " users";
   }
 
   @Override
-  public double getToreAusw() {
+  public Double getToreAusw() {
     List<TippOfUser> tipps = this.getTippsOfUsers();
     double sum = 0;
     for (TippOfUser tipp : tipps) {
@@ -32,7 +27,12 @@ public class TippBundesligaStatistikDeAverage extends TippBundesligaStatistikDe 
   }
 
   @Override
-  public String getPerson() {
-    return "ø of " + this.getTippsOfUsers().size() + " users";
+  public Double getToreHeim() {
+    List<TippOfUser> tipps = this.getTippsOfUsers();
+    double sum = 0;
+    for (TippOfUser tipp : tipps) {
+      sum += tipp.getToreHeim();
+    }
+    return sum / tipps.size();
   }
 }

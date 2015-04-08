@@ -3,8 +3,8 @@ package buka.modelLibsAndDips;
 public class TippOfUser implements Tipp {
 
   private String person;
-  private double toreAusw;
-  private double toreHeim;
+  private Double toreAusw;
+  private Double toreHeim;
 
   @Override
   public String getPerson() {
@@ -12,12 +12,12 @@ public class TippOfUser implements Tipp {
   }
 
   @Override
-  public double getToreAusw() {
+  public Double getToreAusw() {
     return toreAusw;
   }
 
   @Override
-  public double getToreHeim() {
+  public Double getToreHeim() {
     return toreHeim;
   }
 
@@ -25,19 +25,19 @@ public class TippOfUser implements Tipp {
     this.person = person;
   }
 
-  public void setToreAusw(final double toreAusw) {
+  public void setToreAusw(final Double toreAusw) {
     this.toreAusw = toreAusw;
   }
 
   public void setToreAusw(final String tore) throws NumberFormatException {
-    setToreAusw(Integer.parseInt(tore.trim()));
+    setToreAusw(Double.parseDouble(tore.trim()));
   }
 
-  public void setToreHeim(final double toreHeim) {
+  public void setToreHeim(final Double toreHeim) {
     this.toreHeim = toreHeim;
   }
 
   public void setToreHeim(final String tore) throws NumberFormatException {
-    setToreHeim(Integer.parseInt(tore.trim()));
+    setToreHeim(Double.parseDouble(tore.trim()));
   }
 }

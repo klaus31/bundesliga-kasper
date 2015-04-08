@@ -9,6 +9,7 @@ import org.joda.time.format.ISODateTimeFormat;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import buka.modelLibsAndDips.Ergebnis;
 import buka.modelLibsAndDips.Mannschaft;
 import buka.modelLibsAndDips.Partie;
 import buka.modelLibsAndDips.Spieltag;
@@ -18,10 +19,11 @@ public class SpieltagOpenLigaDB implements Spieltag {
 
   private static int getCurrentNumber() {
     JSONObject current = URLReader.getJSONObjectFromUrl("http://www.openligadb.de/api/getcurrentgroup/bl1");
-    return current.getInt("GroupOrderID") + 1;
+    return current.getInt("GroupOrderID");
   }
 
   private final int number;
+  private List<Partie> partien = null;
   private final JSONArray partienJSON;
 
   public SpieltagOpenLigaDB() {
@@ -46,20 +48,33 @@ public class SpieltagOpenLigaDB implements Spieltag {
 
   @Override
   public List<Partie> getPartien() {
-    List<Partie> result = new ArrayList<>(9);
+    if (partien != null) {
+      return partien;
+    }
+    partien = new ArrayList<>(9);
     for (int i = 0; i < partienJSON.length(); i++) {
-      JSONObject partie = partienJSON.getJSONObject(i);
-      JSONObject team1 = partie.getJSONObject("Team1");
-      JSONObject team2 = partie.getJSONObject("Team2");
-      Mannschaft mannschaft1 = new Mannschaft(team1.getString("TeamName"), team1.getInt("TeamId"));
-      Mannschaft mannschaft2 = new Mannschaft(team2.getString("TeamName"), team2.getInt("TeamId"));
+      JSONObject partieJSON = partienJSON.getJSONObject(i);
+      JSONObject teamHeim = partieJSON.getJSONObject("Team1");
+      JSONObject teamAusw = partieJSON.getJSONObject("Team2");
+      Mannschaft mannschaftHeim = new Mannschaft(teamHeim.getString("TeamName"), teamHeim.getInt("TeamId"));
+      Mannschaft mannschaftAusw = new Mannschaft(teamAusw.getString("TeamName"), teamAusw.getInt("TeamId"));
       // anpfiff
-      String timestamp = partie.getString("MatchDateTimeUTC");
+      String timestamp = partieJSON.getString("MatchDateTimeUTC");
       DateTime date = ISODateTimeFormat.dateTimeParser().parseDateTime(timestamp);
       Calendar anpfiff = Calendar.getInstance();
       anpfiff.setTime(date.toDate());
-      result.add(new Partie(this, mannschaft1, mannschaft2, partie.getInt("MatchID"), anpfiff));
+      // add with ergebnis (if finished)
+      Partie partie = new Partie(this, mannschaftHeim, mannschaftAusw, partieJSON.getInt("MatchID"), anpfiff);
+      if (partieJSON.getBoolean("MatchIsFinished")) {
+        final JSONArray matchResults = partieJSON.getJSONArray("MatchResults");
+        JSONObject matchResult = matchResults.getJSONObject(0);
+        if (!matchResult.getString("ResultName").equals("Endergebnis")) {
+          matchResult = matchResults.getJSONObject(1);
+        }
+        partie.setErgebnis(new Ergebnis(matchResult.getInt("PointsTeam1"), matchResult.getInt("PointsTeam2")));
+      }
+      partien.add(partie);
     }
-    return result;
+    return partien;
   }
 }

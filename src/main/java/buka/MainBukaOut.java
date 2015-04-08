@@ -70,29 +70,33 @@ public class MainBukaOut extends Application {
   @Override
   public void start(final Stage stage) {
     this.stage = stage;
-    spieltag = new SpieltagOpenLigaDB(27);
+    spieltag = new SpieltagOpenLigaDB();
     stage.setWidth(defaultWidth);
     stage.setHeight(defaultHeight);
     table.setEditable(false);
     table.setMinWidth(defaultWidth);
     // javafx
     Scene scene = new Scene(new Group());
-    final TableColumn colAnpfiff = getTableColumn("Anpfiff", "anpfiff", 9);
+    scene.getStylesheets().add(getClass().getResource("application.css").toExternalForm());
     final TableColumn colPartie = new TableColumn("Partie");
+    colPartie.getColumns().add(getTableColumn("Anpfiff", "anpfiff", 7));
     colPartie.getColumns().add(getTableColumn("H", "partieHeim", 15));
     colPartie.getColumns().add(getTableColumn("A", "partieAusw", 15));
     final TableColumn colTippAverage = new TableColumn("Tipp ø");
-    colTippAverage.getColumns().add(getTableColumn("H", "tippAverageHeim", 5));
-    colTippAverage.getColumns().add(getTableColumn("A", "tippAverageAusw", 5));
+    colTippAverage.getColumns().add(getTableColumn("H", "tippAverageHeim", 4));
+    colTippAverage.getColumns().add(getTableColumn("A", "tippAverageAusw", 4));
     final TableColumn colTipp1st = new TableColumn("Tipp 1st");
-    colTipp1st.getColumns().add(getTableColumn("H", "tippLeaderHeim", 5));
-    colTipp1st.getColumns().add(getTableColumn("A", "tippLeaderAusw", 5));
+    colTipp1st.getColumns().add(getTableColumn("H", "tippLeaderHeim", 3));
+    colTipp1st.getColumns().add(getTableColumn("A", "tippLeaderAusw", 3));
     final TableColumn colQuote = new TableColumn("Quote");
-    colQuote.getColumns().add(getTableColumn("H", "quoteSiegHeim", 5));
-    colQuote.getColumns().add(getTableColumn("U", "quoteUnentschieden", 5));
-    colQuote.getColumns().add(getTableColumn("A", "quoteSiegAusw", 5));
+    colQuote.getColumns().add(getTableColumn("H", "quoteSiegHeim", 4));
+    colQuote.getColumns().add(getTableColumn("U", "quoteUnentschieden", 4));
+    colQuote.getColumns().add(getTableColumn("A", "quoteSiegAusw", 4));
+    final TableColumn colErgebnis = new TableColumn("Ergebnis");
+    colErgebnis.getColumns().add(getTableColumn("H", "ergebnisHeim", 3));
+    colErgebnis.getColumns().add(getTableColumn("A", "ergebnisAusw", 3));
     table.setItems(data);
-    table.getColumns().addAll(colAnpfiff, colPartie, colTippAverage, colTipp1st, colQuote);
+    table.getColumns().addAll(colPartie, colTippAverage, colTipp1st, colQuote, colErgebnis);
     // layout
     BorderPane border = new BorderPane();
     HBox box1 = new HBox();

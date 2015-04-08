@@ -7,6 +7,7 @@ public class Partie {
 
   private final Calendar anpfiff;
   private final Mannschaft ausw;
+  private Ergebnis ergebnis = null;
   private final Mannschaft heim;
   private final int id;
   private final Spieltag spieltag;
@@ -29,6 +30,10 @@ public class Partie {
     return anpfiff;
   }
 
+  public Ergebnis getErgebnis() {
+    return ergebnis;
+  }
+
   public int getId() {
     return id;
   }
@@ -47,5 +52,9 @@ public class Partie {
 
   public boolean isFinished() {
     return getAbpfiff().getTime().before(new Date());
+  }
+
+  public void setErgebnis(final Ergebnis ergebnis) {
+    this.ergebnis = ergebnis;
   }
 }
