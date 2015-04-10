@@ -12,22 +12,19 @@ import buka.tipps.TippBundesligaStatistikDeAverage;
 import buka.tipps.TippBundesligaStatistikDeLeader;
 import buka.tipps.TippFactory;
 import buka.tipps.TippStatistik;
-import buka.wetten.Budget;
 import buka.wetten.EinsatzStrategie;
 import buka.wetten.EinsatzStrategieKelly;
 import buka.wetten.WettStrategie;
 import buka.wetten.WettStrategieSchwarmintelligenzUndQuote;
 import buka.wetten.Wette;
+import buka.wetten.Zahlung;
 
-/*
- * TODO das ganze zeugs hat leider ein design problem: Alles wird immer anhand einer einzelnen partie berechnet. das budget allerdings ist für den ganzen spieltag. so lässt sich nix berechnen auf "spieltag == 100 €"
- */
 public class BukaRow {
 
-  private static final Budget BUDGET = Budget.DEFAULT_SPIELTAG;
+  private static final Zahlung BUDGET = Zahlung.DEFAULT_BUDGET_SPIELTAG;
   private final DecimalFormat dfDefault = new DecimalFormat("0");
   private final DecimalFormat dfTwoDp = new DecimalFormat("0.00");
-  private final Budget empfohlenerEinsatz;
+  private final Zahlung empfohlenerEinsatz;
   private final Ergebnis ergebnis;
   private final Wette favorisierteWette;
   private final Partie partie;
@@ -132,25 +129,20 @@ public class BukaRow {
   }
 
   public String getWetteGewinn() {
-    final Boolean won = favorisierteWette.won(partie);
-    if (won == null) {
+    Zahlung gewinn = favorisierteWette.getGewinn(partie, quote, empfohlenerEinsatz);
+    if (gewinn == null) {
       return "?";
     } else {
-      if (won) {
-        double gewinn = quote.getProfitRate(favorisierteWette) * empfohlenerEinsatz.getEuroCents() - empfohlenerEinsatz.getEuroCents();
-        return new Budget(gewinn).toString();
-      } else {
-        return Budget.NO.toString();
-      }
+      return gewinn.getEuroCents() == 0 ? "-" : gewinn.toString();
     }
   }
 
   public String getWetteVerlust() {
-    final Boolean won = favorisierteWette.won(partie);
-    if (won == null) {
+    Zahlung verlust = favorisierteWette.getVerlust(partie, quote, empfohlenerEinsatz);
+    if (verlust == null) {
       return "?";
     } else {
-      return won ? Budget.NO.toString() : empfohlenerEinsatz.toString();
+      return verlust.getEuroCents() == 0 ? "-" : verlust.toString();
     }
   }
 

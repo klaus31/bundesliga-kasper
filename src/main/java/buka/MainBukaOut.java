@@ -21,7 +21,7 @@ import javafx.stage.Stage;
 import buka.basics.Partie;
 import buka.spieltage.Spieltag;
 import buka.spieltage.SpieltagOpenLigaDB;
-import buka.wetten.Budget;
+import buka.wetten.Zahlung;
 
 @SuppressWarnings({ "rawtypes", "unchecked" })
 public class MainBukaOut extends Application {
@@ -106,7 +106,7 @@ public class MainBukaOut extends Application {
     colQuote.getColumns().add(getTableColumn("U", "quoteUnentschieden", 4));
     colQuote.getColumns().add(getTableColumn("A", "quoteSiegAusw", 4));
     // wetten
-    final TableColumn colWette = new TableColumn("Wette " + Budget.DEFAULT_SPIELTAG.toString());
+    final TableColumn colWette = new TableColumn("Wette " + Zahlung.DEFAULT_BUDGET_SPIELTAG.toString());
     colWette.getColumns().add(getTableColumn("Auf", "wetteAuf", 4));
     colWette.getColumns().add(getTableColumn("%", "wetteWahrscheinlichkeit", 4));
     colWette.getColumns().add(getTableColumn("Einsatz", "wetteEinsatz", 6));

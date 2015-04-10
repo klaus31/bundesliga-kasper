@@ -3,6 +3,7 @@ package buka.wetten;
 import java.security.InvalidParameterException;
 
 import buka.basics.Partie;
+import buka.quoten.Quote;
 
 public class Wette {
 
@@ -16,6 +17,29 @@ public class Wette {
     }
     this.wahrscheinlichkeit = wahrscheinlichkeit;
     this.wetteAuf = wetteAuf;
+  }
+
+  public Zahlung getGewinn(final Partie partie, final Quote quote, final Zahlung einsatz) {
+    final Boolean won = this.won(partie);
+    if (won == null) {
+      return null;
+    } else {
+      if (won) {
+        double gewinn = quote.getProfitRate(this) * einsatz.getEuroCents() - einsatz.getEuroCents();
+        return new Zahlung(gewinn);
+      } else {
+        return Zahlung.NIX;
+      }
+    }
+  }
+
+  public Zahlung getVerlust(final Partie partie, final Quote quote, final Zahlung einsatz) {
+    final Boolean won = this.won(partie);
+    if (won == null) {
+      return null;
+    } else {
+      return won ? Zahlung.NIX : einsatz;
+    }
   }
 
   /**
@@ -34,7 +58,7 @@ public class Wette {
     return this.wetteAuf.equals(WetteAuf.LIEBER_GAR_NICHT);
   }
 
-  public Boolean won(final Partie partie) {
+  private Boolean won(final Partie partie) {
     if (partie.isFinished()) {
       return partie.getErgebnis().matches(getWetteAuf());
     } else {

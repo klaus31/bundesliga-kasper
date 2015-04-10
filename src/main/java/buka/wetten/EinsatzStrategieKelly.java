@@ -17,21 +17,26 @@ public class EinsatzStrategieKelly implements EinsatzStrategie {
     this(quotenFactory.getQuote(), wettStrategie.getFavorisierteWette());
   }
 
+  /* FIXME das ganze zeugs hat leider ein design problem: Alles wird immer
+   * anhand einer einzelnen partie berechnet. das budget allerdings ist für den
+   * ganzen spieltag. so lässt sich nix berechnen auf "spieltag == 100 €"
+   * du kannst also hier nur einen einsatz empfehlen, wenn du alle wetten und
+   * quoten des gesamten spieltags hast (herzlichen glückwunsch dazu). */
   @Override
-  public Budget getEmpfohlenenEinsatz(final Budget partieBudget) {
+  public Zahlung getEmpfohlenenEinsatz(final Zahlung partieBudget) {
     // http://de.wikipedia.org/wiki/Kelly-Formel
     if (wette.isDoNotBetBet()) {
-      return Budget.NO;
+      return Zahlung.NIX;
     }
     if (quote == null) {
-      return Budget.NO;
+      return Zahlung.NIX;
     }
     final double w = wette.getWahrscheinlichkeit();
     final double q = quote.getProfitRate(wette);
     if (q < 1) {
-      return Budget.NO;
+      return Zahlung.NIX;
     }
     final double k = (q * w - 1) / (q - 1);
-    return new Budget(k * partieBudget.getEuroCents());
+    return new Zahlung(k * partieBudget.getEuroCents());
   }
 }

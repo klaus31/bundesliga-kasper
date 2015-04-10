@@ -2,14 +2,14 @@ package buka.wetten;
 
 import java.text.DecimalFormat;
 
-public class Budget {
+public class Zahlung {
 
-  public static final Budget DEFAULT_PARTIE = new Budget(10000 / 9);
-  public static final Budget DEFAULT_SPIELTAG = new Budget(10000);
-  public static final Budget NO = new Budget(0);;
+  public static final Zahlung DEFAULT_BUDGET_PARTIE = new Zahlung(10000 / 9);
+  public static final Zahlung DEFAULT_BUDGET_SPIELTAG = new Zahlung(10000);
+  public static final Zahlung NIX = new Zahlung(0);
   private final int cents;
 
-  public Budget(final double d) {
+  public Zahlung(final double d) {
     this.cents = (int) Math.round(d);
   }
 
