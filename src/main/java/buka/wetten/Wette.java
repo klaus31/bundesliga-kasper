@@ -2,6 +2,8 @@ package buka.wetten;
 
 import java.security.InvalidParameterException;
 
+import buka.basics.Partie;
+
 public class Wette {
 
   public static final Wette LIEBER_NICHT = new Wette(WetteAuf.LIEBER_GAR_NICHT, 0);
@@ -30,5 +32,13 @@ public class Wette {
 
   public boolean isDoNotBetBet() {
     return this.wetteAuf.equals(WetteAuf.LIEBER_GAR_NICHT);
+  }
+
+  public Boolean won(final Partie partie) {
+    if (partie.isFinished()) {
+      return partie.getErgebnis().matches(getWetteAuf());
+    } else {
+      return null;
+    }
   }
 }

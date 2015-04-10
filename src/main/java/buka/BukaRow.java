@@ -18,8 +18,10 @@ import buka.wetten.EinsatzStrategieKelly;
 import buka.wetten.WettStrategie;
 import buka.wetten.WettStrategieSchwarmintelligenzUndQuote;
 import buka.wetten.Wette;
-import buka.wetten.WetteAuf;
 
+/*
+ * TODO das ganze zeugs hat leider ein design problem: Alles wird immer anhand einer einzelnen partie berechnet. das budget allerdings ist für den ganzen spieltag. so lässt sich nix berechnen auf "spieltag == 100 €"
+ */
 public class BukaRow {
 
   private static final Budget BUDGET = Budget.DEFAULT_SPIELTAG;
@@ -27,11 +29,11 @@ public class BukaRow {
   private final DecimalFormat dfTwoDp = new DecimalFormat("0.00");
   private final Budget empfohlenerEinsatz;
   private final Ergebnis ergebnis;
+  private final Wette favorisierteWette;
   private final Partie partie;
   private final Quote quote;
   private final TippStatistik tippAverage;
   private final TippStatistik tippLeader;
-  private final WettStrategie wettStrategie;
 
   public BukaRow(final Partie partie) {
     this.partie = partie;
@@ -39,9 +41,10 @@ public class BukaRow {
     tippAverage = new TippBundesligaStatistikDeAverage(partie);
     tippLeader = new TippBundesligaStatistikDeLeader(partie);
     final QuotenFactory qf = new QuotenFactoryProxy(partie);
-    wettStrategie = new WettStrategieSchwarmintelligenzUndQuote((TippFactory) tippAverage, qf);
+    final WettStrategie wettStrategie = new WettStrategieSchwarmintelligenzUndQuote((TippFactory) tippAverage, qf);
+    favorisierteWette = wettStrategie.getFavorisierteWette();
     quote = qf.getQuote();
-    EinsatzStrategie einsatzStrategie = new EinsatzStrategieKelly(qf, wettStrategie);
+    final EinsatzStrategie einsatzStrategie = new EinsatzStrategieKelly(qf, wettStrategie);
     empfohlenerEinsatz = einsatzStrategie.getEmpfohlenenEinsatz(BUDGET);
   }
 
@@ -112,7 +115,7 @@ public class BukaRow {
   }
 
   public String getWetteAuf() {
-    switch (wettStrategie.getFavorisierteWette().getWetteAuf()) {
+    switch (favorisierteWette.getWetteAuf()) {
     case SIEG_AUSW:
       return "A";
     case SIEG_HEIM:
@@ -120,7 +123,7 @@ public class BukaRow {
     case UNENTSCHIEDEN:
       return "U";
     default:
-      return "!";
+      return "NIX";
     }
   }
 
@@ -129,34 +132,29 @@ public class BukaRow {
   }
 
   public String getWetteGewinn() {
-    if (partie.isFinished()) {
-      Wette wette = wettStrategie.getFavorisierteWette();
-      WetteAuf wetteAuf = wette.getWetteAuf();
-      if (partie.getErgebnis().matches(wetteAuf)) {
-        return new Budget(quote.getProfitRate(wette) * empfohlenerEinsatz.getEuroCents()).toString();
+    final Boolean won = favorisierteWette.won(partie);
+    if (won == null) {
+      return "?";
+    } else {
+      if (won) {
+        double gewinn = quote.getProfitRate(favorisierteWette) * empfohlenerEinsatz.getEuroCents() - empfohlenerEinsatz.getEuroCents();
+        return new Budget(gewinn).toString();
       } else {
         return Budget.NO.toString();
       }
-    } else {
-      return "?";
     }
   }
 
   public String getWetteVerlust() {
-    if (partie.isFinished()) {
-      Wette wette = wettStrategie.getFavorisierteWette();
-      WetteAuf wetteAuf = wette.getWetteAuf();
-      if (partie.getErgebnis().matches(wetteAuf)) {
-        return Budget.NO.toString();
-      } else {
-        return new Budget(quote.getProfitRate(wette) * empfohlenerEinsatz.getEuroCents()).toString();
-      }
-    } else {
+    final Boolean won = favorisierteWette.won(partie);
+    if (won == null) {
       return "?";
+    } else {
+      return won ? Budget.NO.toString() : empfohlenerEinsatz.toString();
     }
   }
 
   public String getWetteWahrscheinlichkeit() {
-    return Math.round(wettStrategie.getFavorisierteWette().getWahrscheinlichkeit() * 100) + "";
+    return Math.round(favorisierteWette.getWahrscheinlichkeit() * 100) + "";
   }
 }
