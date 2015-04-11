@@ -1,16 +1,12 @@
 package buka.spieltage;
 
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.List;
 
-import org.joda.time.DateTime;
-import org.joda.time.format.ISODateTimeFormat;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-import buka.basics.Ergebnis;
-import buka.basics.Mannschaft;
+import buka.basics.OpenLigaDB;
 import buka.basics.Partie;
 import buka.basics.URLReader;
 
@@ -53,25 +49,8 @@ public class SpieltagOpenLigaDB implements Spieltag {
     partien = new ArrayList<>(9);
     for (int i = 0; i < partienJSON.length(); i++) {
       JSONObject partieJSON = partienJSON.getJSONObject(i);
-      JSONObject teamHeim = partieJSON.getJSONObject("Team1");
-      JSONObject teamAusw = partieJSON.getJSONObject("Team2");
-      Mannschaft mannschaftHeim = new Mannschaft(teamHeim.getString("TeamName"), teamHeim.getInt("TeamId"));
-      Mannschaft mannschaftAusw = new Mannschaft(teamAusw.getString("TeamName"), teamAusw.getInt("TeamId"));
-      // anpfiff
-      String timestamp = partieJSON.getString("MatchDateTimeUTC");
-      DateTime date = ISODateTimeFormat.dateTimeParser().parseDateTime(timestamp);
-      Calendar anpfiff = Calendar.getInstance();
-      anpfiff.setTime(date.toDate());
-      // add with ergebnis (if finished)
-      Partie partie = new Partie(this, mannschaftHeim, mannschaftAusw, partieJSON.getInt("MatchID"), anpfiff);
-      if (partieJSON.getBoolean("MatchIsFinished")) {
-        final JSONArray matchResults = partieJSON.getJSONArray("MatchResults");
-        JSONObject matchResult = matchResults.getJSONObject(0);
-        if (!matchResult.getString("ResultName").equals("Endergebnis")) {
-          matchResult = matchResults.getJSONObject(1);
-        }
-        partie.setErgebnis(new Ergebnis(matchResult.getInt("PointsTeam1"), matchResult.getInt("PointsTeam2")));
-      }
+      Partie partie = OpenLigaDB.getPartie(partieJSON);
+      partie.setSpieltag(this);
       partien.add(partie);
     }
     return partien;

@@ -21,7 +21,6 @@ import javafx.stage.Stage;
 import buka.basics.Partie;
 import buka.spieltage.Spieltag;
 import buka.spieltage.SpieltagOpenLigaDB;
-import buka.wetten.Zahlung;
 
 @SuppressWarnings({ "rawtypes", "unchecked" })
 public class MainBukaOut extends Application {
@@ -105,14 +104,16 @@ public class MainBukaOut extends Application {
     colQuote.getColumns().add(getTableColumn("H", "quoteSiegHeim", 4));
     colQuote.getColumns().add(getTableColumn("U", "quoteUnentschieden", 4));
     colQuote.getColumns().add(getTableColumn("A", "quoteSiegAusw", 4));
-    // wetten
-    final TableColumn colWette = new TableColumn("Wette " + Zahlung.DEFAULT_BUDGET_SPIELTAG.toString());
-    colWette.getColumns().add(getTableColumn("Auf", "wetteAuf", 4));
-    colWette.getColumns().add(getTableColumn("%", "wetteWahrscheinlichkeit", 4));
-    colWette.getColumns().add(getTableColumn("Einsatz", "wetteEinsatz", 6));
-    colWette.getColumns().add(getTableColumn("Gewinn", "wetteGewinn", 6));
-    colWette.getColumns().add(getTableColumn("Verlust", "wetteVerlust", 6));
-    table.getColumns().addAll(colPartie, colTipps, colQuote, colWette);
+    // historie
+    final TableColumn colHistorie = new TableColumn("Historie");
+    final TableColumn colHistorieZuletzt = new TableColumn("Zuletzt");
+    colHistorieZuletzt.getColumns().add(getTableColumn("H:A", "historieLetzteHA", 4));
+    colHistorieZuletzt.getColumns().add(getTableColumn("egal", "historieLetzteEgal", 4));
+    final TableColumn colHistorieAverage = new TableColumn("ø (" + BukaRow.HISTORIE_PARTIEN_BETRACHTET + " Begegnungen)");
+    colHistorieAverage.getColumns().add(getTableColumn("H:A", "historieHA", 7));
+    colHistorieAverage.getColumns().add(getTableColumn("alle", "historieAll", 7));
+    colHistorie.getColumns().addAll(colHistorieZuletzt, colHistorieAverage);
+    table.getColumns().addAll(colPartie, colTipps, colQuote, colHistorie);
     table.setItems(data);
     // layout
     BorderPane border = new BorderPane();

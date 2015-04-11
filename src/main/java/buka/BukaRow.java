@@ -2,31 +2,26 @@ package buka;
 
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
+import java.util.List;
 
 import buka.basics.Ergebnis;
 import buka.basics.Partie;
 import buka.quoten.Quote;
 import buka.quoten.QuotenFactory;
 import buka.quoten.QuotenFactoryProxy;
+import buka.statistics.ErgebnisFactory;
+import buka.statistics.ErgebnisFactoryDefault;
 import buka.tipps.TippBundesligaStatistikDeAverage;
 import buka.tipps.TippBundesligaStatistikDeLeader;
-import buka.tipps.TippFactory;
 import buka.tipps.TippStatistik;
-import buka.wetten.EinsatzStrategie;
-import buka.wetten.EinsatzStrategieKelly;
-import buka.wetten.WettStrategie;
-import buka.wetten.WettStrategieSchwarmintelligenzUndQuote;
-import buka.wetten.Wette;
-import buka.wetten.Zahlung;
 
 public class BukaRow {
 
-  private static final Zahlung BUDGET = Zahlung.DEFAULT_BUDGET_SPIELTAG;
+  public static final int HISTORIE_PARTIEN_BETRACHTET = 4;
   private final DecimalFormat dfDefault = new DecimalFormat("0");
   private final DecimalFormat dfTwoDp = new DecimalFormat("0.00");
-  private final Zahlung empfohlenerEinsatz;
+  private final ErgebnisFactory ef = new ErgebnisFactoryDefault();
   private final Ergebnis ergebnis;
-  private final Wette favorisierteWette;
   private final Partie partie;
   private final Quote quote;
   private final TippStatistik tippAverage;
@@ -38,11 +33,7 @@ public class BukaRow {
     tippAverage = new TippBundesligaStatistikDeAverage(partie);
     tippLeader = new TippBundesligaStatistikDeLeader(partie);
     final QuotenFactory qf = new QuotenFactoryProxy(partie);
-    final WettStrategie wettStrategie = new WettStrategieSchwarmintelligenzUndQuote((TippFactory) tippAverage, qf);
-    favorisierteWette = wettStrategie.getFavorisierteWette();
     quote = qf.getQuote();
-    final EinsatzStrategie einsatzStrategie = new EinsatzStrategieKelly(qf, wettStrategie);
-    empfohlenerEinsatz = einsatzStrategie.getEmpfohlenenEinsatz(BUDGET);
   }
 
   public String getAnpfiff() {
@@ -57,6 +48,71 @@ public class BukaRow {
   public String getErgebnisHeim() {
     final Integer ergebnisHeim = ergebnis == null ? null : ergebnis.getHeim();
     return ergebnisHeim == null ? "?" : ergebnisHeim + "";
+  }
+
+  /**
+   * die letzten 5 partien dieser konstelation (heim auswärts oder umgekehrt)
+   */
+  public String getHistorieAll() {
+    List<Partie> partien = ef.getLastFinishedPartienBetween(HISTORIE_PARTIEN_BETRACHTET, partie.getMannschaftHeim(), partie.getMannschaftAusw());
+    if (partien.isEmpty()) {
+      return "-";
+    }
+    int toreCurrentHeimMannschaft = 0;
+    int toreCurrentAuswMannschaft = 0;
+    for (Partie partie : partien) {
+      if (partie.getMannschaftHeim().getId() == this.partie.getMannschaftHeim().getId()) {
+        toreCurrentHeimMannschaft += partie.getErgebnis().getHeim();
+        toreCurrentAuswMannschaft += partie.getErgebnis().getAusw();
+      } else {
+        toreCurrentHeimMannschaft += partie.getErgebnis().getAusw();
+        toreCurrentAuswMannschaft += partie.getErgebnis().getHeim();
+      }
+    }
+    final double toreHeimAvg = 1D * toreCurrentHeimMannschaft / partien.size();
+    final double toreAuswAvg = 1D * toreCurrentAuswMannschaft / partien.size();
+    return dfTwoDp.format(toreHeimAvg) + " : " + dfTwoDp.format(toreAuswAvg);
+  }
+
+  /**
+   * die letzten 5 partien dieser konstelation (heim auswärts beachtet)
+   */
+  public String getHistorieHA() {
+    List<Partie> partien = ef.getLastFinishedPartien(HISTORIE_PARTIEN_BETRACHTET, partie.getMannschaftHeim(), partie.getMannschaftAusw());
+    if (partien.isEmpty()) {
+      return "-";
+    }
+    int toreHeimMannschaft = 0;
+    int toreAuswMannschaft = 0;
+    for (Partie partie : partien) {
+      toreHeimMannschaft += partie.getErgebnis().getHeim();
+      toreAuswMannschaft += partie.getErgebnis().getAusw();
+    }
+    final double toreHeimAvg = 1D * toreHeimMannschaft / partien.size();
+    final double toreAuswAvg = 1D * toreAuswMannschaft / partien.size();
+    return dfTwoDp.format(toreHeimAvg) + " : " + dfTwoDp.format(toreAuswAvg);
+  }
+
+  public String getHistorieLetzteEgal() {
+    Partie lastPartie = ef.getLastFinishedPartieBetween(this.partie.getMannschaftHeim(), this.partie.getMannschaftAusw());
+    if (lastPartie == null) {
+      return "-";
+    } else {
+      if (lastPartie.getMannschaftHeim().getId() == this.partie.getMannschaftHeim().getId()) {
+        return lastPartie.getErgebnis().getHeim() + ":" + lastPartie.getErgebnis().getAusw();
+      } else {
+        return lastPartie.getErgebnis().getAusw() + ":" + lastPartie.getErgebnis().getHeim();
+      }
+    }
+  }
+
+  public String getHistorieLetzteHA() {
+    Partie lastPartie = ef.getLastFinishedPartie(partie.getMannschaftHeim(), partie.getMannschaftAusw());
+    if (lastPartie == null) {
+      return "-";
+    } else {
+      return lastPartie.getErgebnis().getHeim() + ":" + lastPartie.getErgebnis().getAusw();
+    }
   }
 
   public String getPartieAusw() {
@@ -109,44 +165,5 @@ public class BukaRow {
       result = dfDefault.format(tippLeader.getToreHeim());
     }
     return result;
-  }
-
-  public String getWetteAuf() {
-    switch (favorisierteWette.getWetteAuf()) {
-    case SIEG_AUSW:
-      return "A";
-    case SIEG_HEIM:
-      return "H";
-    case UNENTSCHIEDEN:
-      return "U";
-    default:
-      return "NIX";
-    }
-  }
-
-  public String getWetteEinsatz() {
-    return empfohlenerEinsatz.toString();
-  }
-
-  public String getWetteGewinn() {
-    Zahlung gewinn = favorisierteWette.getGewinn(partie, quote, empfohlenerEinsatz);
-    if (gewinn == null) {
-      return "?";
-    } else {
-      return gewinn.getEuroCents() == 0 ? "-" : gewinn.toString();
-    }
-  }
-
-  public String getWetteVerlust() {
-    Zahlung verlust = favorisierteWette.getVerlust(partie, quote, empfohlenerEinsatz);
-    if (verlust == null) {
-      return "?";
-    } else {
-      return verlust.getEuroCents() == 0 ? "-" : verlust.toString();
-    }
-  }
-
-  public String getWetteWahrscheinlichkeit() {
-    return Math.round(favorisierteWette.getWahrscheinlichkeit() * 100) + "";
   }
 }
