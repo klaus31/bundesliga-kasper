@@ -39,6 +39,8 @@ public abstract class TippBundesligaStatistikDe implements TippFactory, TippStat
       result = "FSV Mainz 05";
     } else if (result.equals("Hertha BSC")) {
       result = "Hertha BSC Berlin";
+    } else if (result.equals("Borussia Mönchengladbach")) {
+      result = "ladbach";
     }
     return result;
   }
@@ -52,21 +54,24 @@ public abstract class TippBundesligaStatistikDe implements TippFactory, TippStat
     if (tippsOfUsers == null) {
       tippsOfUsers = new ArrayList<>();
       String result = getContent();
-      result = result.substring(result.indexOf(this.getName(this.getPartie().getMannschaftHeim())));
-      final String[] tippLines = result.split(System.lineSeparator());
-      for (int i = 0; i < tippLines.length; i++) {
-        if (i == 0) {
-          continue;
-        }
-        String[] pieces = tippLines[i].trim().split(":");
-        try {
-          final TippOfUser tipp = new TippOfUser();
-          tipp.setPerson(pieces[0].trim());
-          tipp.setToreHeim(pieces[1].replaceAll(" ", "").replaceAll(" ", "").charAt(0) + "");
-          tipp.setToreAusw(pieces[2].replaceAll(" ", "").replaceAll(" ", "").charAt(0) + "");
-          tippsOfUsers.add(tipp);
-        } catch (final NumberFormatException | IndexOutOfBoundsException e) {
-          break;
+      final int index = result.indexOf(this.getName(this.getPartie().getMannschaftHeim()));
+      if (result.length() > index) {
+        result = result.substring(index);
+        final String[] tippLines = result.split(System.lineSeparator());
+        for (int i = 0; i < tippLines.length; i++) {
+          if (i == 0) {
+            continue;
+          }
+          String[] pieces = tippLines[i].trim().split(":");
+          try {
+            final TippOfUser tipp = new TippOfUser();
+            tipp.setPerson(pieces[0].trim());
+            tipp.setToreHeim(pieces[1].replaceAll(" ", "").replaceAll(" ", "").charAt(0) + "");
+            tipp.setToreAusw(pieces[2].replaceAll(" ", "").replaceAll(" ", "").charAt(0) + "");
+            tippsOfUsers.add(tipp);
+          } catch (final NumberFormatException | IndexOutOfBoundsException e) {
+            break;
+          }
         }
       }
     }
